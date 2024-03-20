@@ -7,6 +7,23 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [filteredList, setFilteredList] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [searchedItem, setSearchedItem] = useState('');
+  const [toggleClicked, setToggleClicked] = useState(false);
+
+  const handleSearch = () => {
+    setToggleClicked((curr) => !curr)
+    setFilteredList(filteredList.filter(item => item.name.includes(searchedItem)))
+
+  }
+
+  const handleReset = () => {
+    setToggleClicked((curr) => !curr)
+    setSearchedItem('')
+    setFilteredList(pokemonList)
+  }
+
+  const handleChange = ({ target: { value } }) => setSearchedItem(value)
+
 
   useEffect(() => {
     if (pokemonList.length > 0) {
@@ -14,18 +31,6 @@ function App() {
       setShowSearch(true);
     }
   }, [pokemonList]);
-
-  const handleSearch = (event) => {
-    const { value } = event.target;
-
-    const query = value;
-    let updatedList = filteredList;
-    updatedList = updatedList.filter((item) => {
-      return item.name.toLowerCase().indexOf(query.toLowerCase()) !== -1;
-    });
-
-    setFilteredList(updatedList);
-  };
 
   const fetchPokemon = () => {
     setIsLoading(true);
@@ -45,8 +50,14 @@ function App() {
       <FetchButton prop={fetchPokemon} />
       {!isLoading && showSearch && (
         <div className="card search">
-          <input onChange={handleSearch} type="text" />
-          <button>Buscar!</button>
+          <input value={searchedItem} onChange={handleChange} type="text" />
+          {!toggleClicked && (
+            <button onClick={handleSearch}>Buscar</button>
+          )}
+
+          {toggleClicked && (
+            <button onClick={handleReset}>Resetar</button>
+          )}
         </div>
       )}
       {isLoading && (
